@@ -7,7 +7,7 @@ terraform {
   }
   backend "s3" {
     bucket = "kono-terraform-tfstate"
-    key    = "kono_challenge4-1.tfstate"
+    key    = "kono_challenge4-2.tfstate"
     region = "ap-northeast-1"
   }
 }

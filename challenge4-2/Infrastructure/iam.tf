@@ -36,6 +36,19 @@ resource "aws_iam_role_policy" "api_ec2_policy" {
         Effect   = "Allow"
         Action   = ["secretsmanager:GetSecretValue"]
         Resource = aws_secretsmanager_secret.db_pass.arn
+      },
+      {
+        Effect = "Allow"
+        Action = ["ssm:SendCommand"]
+        Resource = [
+          "arn:aws:ec2:${var.aws_region}:*:instance/*",
+          "arn:aws:ssm:${var.aws_region}::document/AWS-RunShellScript"
+        ]
+      },
+      {
+        Effect   = "Allow"
+        Action   = ["ec2:DescribeInstances", "ssm:DescribeInstanceInformation"]
+        Resource = "*"
       }
     ]
   })

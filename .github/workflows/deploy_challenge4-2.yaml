@@ -43,7 +43,6 @@ jobs:
 
       - name: Deploy via SSM
         env:
-          INSTANCE_ID: ${{ secrets.API_EC2_INSTANCE_ID }}
           IMAGE: ${{ steps.build-image.outputs.image }}
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
@@ -60,10 +59,11 @@ jobs:
             --query "Command.CommandId" --output text)
 
           for i in $(seq 1 24); do
-            STATUS=$(aws ssm get-command-invocation \
+            STATUS=$(aws ssm list-command-invocations \
               --command-id "$COMMAND_ID" \
-              --instance-id "$INSTANCE_ID" \
-              --query "Status" --output text 2>/dev/null || echo "Pending")
+              --query "CommandInvocations[0].Status" \
+              --output text 2>/dev/null || echo "Pending")
+            echo "Status: $STATUS"
             [ "$STATUS" = "Success" ] && exit 0
             [ "$STATUS" = "Failed" ] && exit 1
             sleep 5

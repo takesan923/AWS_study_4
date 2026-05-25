@@ -50,4 +50,4 @@ def health_check():
 
 @app.get("/api/error-test")
 def error_test():
-    raise Exception("テスト用エラー")
+    raise HTTPException(status_code=500, detail={"message":"テスト用エラー"})

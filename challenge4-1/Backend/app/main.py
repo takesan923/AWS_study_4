@@ -18,19 +18,25 @@ app = FastAPI(title="タスク管理 API")
 @app.middleware("http")
 async def _log_requests(request: Request, call_next):
     start = time.time()
-    response = await call_next(request)
-    duration_ms = round((time.time() - start) * 1000)
-    level = logging.ERROR if response.status_code >= 500 else logging.INFO
-    logger.log(
-        level,
-        "request",
-        extra={
+    try:
+        response = await call_next(request)
+    except Exception as exc:
+        duration_ms = round((time.time() - start) * 1000)
+        logger.error("request", exc_info=exc, extra={
             "method": request.method,
             "path": request.url.path,
-            "status_code": response.status_code,
+            "status_code": 500,
             "duration_ms": duration_ms,
-        },
-    )
+        })
+        raise
+    duration_ms = round((time.time() - start) * 1000)
+    level = logging.ERROR if response.status_code >= 500 else logging.INFO
+    logger.log(level, "request", extra={
+        "method": request.method,
+        "path": request.url.path,
+        "status_code": response.status_code,
+        "duration_ms": duration_ms,
+    })
     return response
 
 

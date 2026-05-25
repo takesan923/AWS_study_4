@@ -47,3 +47,7 @@ app.include_router(tasks.router, prefix="/api/tasks", tags=["Tasks"])
 @app.get("/health")
 def health_check():
     return {"status": "ok"}
+
+@app.get("/api/error-test")
+def error_test():
+    raise Exception("テスト用エラー")
